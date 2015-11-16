@@ -71,8 +71,7 @@ public class Example extends ApplicationAdapter {
     }
 }
 ```
-
-Result:
+![NoiseGenerator](https://github.com/czyzby/noise4j/blob/master/examples/noise.png "NoiseGenerator")
 
 ## Cellular automata generator
 
@@ -123,6 +122,8 @@ public class Example extends ApplicationAdapter {
     }
 }
 ```
+![CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/cellular.png "CellularAutomataGenerator")
+
 
 Bigger radius:
 ```
@@ -134,11 +135,15 @@ Bigger radius:
         cellularGenerator.setIterationsAmount(6);
         cellularGenerator.generate(grid);
 ```
+![CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/cellular-radius2.png "CellularAutomataGenerator")
 
 
 ### Combined
 
 `NoiseGenerator` and `CellularAutomataGenerator` combined can generate maps similar to this:
+
+![NoiseGenerator + CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/noise%2Bcellular.png "NoiseGenerator + CellularAutomataGenerator")
+
 
 On this scale, this might look like a cavern system, but you don't have to generate maps that big (or with the same parameters, for that matter). Note that here each tile is represented by a single pixel - given than the map's size is 512x512 tiles, with a relatively small tile image at 16x16px, this would take 67108864 (8192x8192) pixels to draw. With a smaller map and appropriate tiles, such map could be used to represent islands, for example.
 
