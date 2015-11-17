@@ -12,6 +12,19 @@ Gradle dependency:
     compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT'
 ```
 
+### LibGDX
+While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. At first, add the mentioned Gradle dependency to the core project. Don't forget to also include the sources dependency in GWT project:
+```
+    compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT:sources'
+```
+
+You need to inherit `Noise4J` GWT module in your `GdxDefinition`, otherwise GWT compiler will not recognize the classes:
+```
+	<inherits name='com.github.czyzby.noise4j.Noise4J' />
+```
+
+`Noise4J` does not use reflection, so its files do not need to be registered in any other way.
+
 ## Noise generator
 
 LibGDX usage example:
@@ -145,11 +158,11 @@ Bigger radius:
 ![NoiseGenerator + CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/noise%2Bcellular.png "NoiseGenerator + CellularAutomataGenerator")
 
 
-On this scale, this might look like a cavern system, but you don't have to generate maps that big (or with the same parameters, for that matter). Note that here each tile is represented by a single pixel - given than the map's size is 512x512 tiles, with a relatively small tile image at 16x16px, this would take 67108864 (8192x8192) pixels to draw. With a smaller map and appropriate tiles, such map could be used to represent islands, for example.
+On this scale, this might look somewhat like some cavern system, but you don't have to generate maps that big (or with the same parameters, for that matter). Note that here each tile is represented by a single pixel - given than the map's size is 512x512 tiles, with a relatively small tile image size at 16x16px, this map would need 67108864 (8192x8192) pixels to be drawn. With a smaller map and appropriate tiles, such map could be just as easily used to represent islands, for example.
 
 ## What can I do with the Grid...
 
-By default, noise generator adds [0, `modifier`] to each cell on each generation.
+By default, noise generator adds [0, `modifier`] to each cell on each generation, smoothing values between the regions that you define.
 
 Cellular generator sees cells as alive (`cell >= marker`) or dead (`cell < marker`); on each iteration, it can kill (`cell -= marker`) a cell with too few living neighbors or bring back to live (`cell += marker`) a dead cell with enough neighbors.
 
