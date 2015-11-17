@@ -88,7 +88,7 @@ public class NoiseGenerator extends AbstractGenerator implements CellConsumer {
     }
 
     /** @param algorithmProvider handles interpolation and noise math.
-     * @see NoiseAlgorithmProvider.DefaultNoiseAlgorithmProvider */
+     * @see DefaultNoiseAlgorithmProvider */
     public void setAlgorithmProvider(final NoiseAlgorithmProvider algorithmProvider) {
         this.algorithmProvider = algorithmProvider;
     }
