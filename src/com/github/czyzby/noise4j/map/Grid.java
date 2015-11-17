@@ -5,7 +5,7 @@ import java.util.Arrays;
 /** A float array wrapper. Allows to use a single 1D float array as a 2D array.
  *
  * @author MJ */
-public class Grid implements Cloneable {
+public class Grid {
     private final float[] grid;
     private final int width;
     private final int height;
@@ -170,8 +170,8 @@ public class Grid implements Cloneable {
     }
 
     /** @param cellConsumer will consume each cell. If returns true, further iteration will be cancelled.
-     * @param fromIndex actual
-     * @param toIndex */
+     * @param fromIndex actual array index, begins the iteration. Min i 0.
+     * @param toIndex actual array index (excluded); iterations ends with this value -1. Max is length of array. */
     protected void iterate(final CellConsumer cellConsumer, final int fromIndex, final int toIndex) {
         for (int index = fromIndex; index < toIndex; index++) {
             if (cellConsumer.consume(this, toX(index), toY(index), grid[index])) {
@@ -313,16 +313,13 @@ public class Grid implements Cloneable {
         return Arrays.hashCode(grid);
     }
 
-    @Override
-    protected Object clone() {
-        return new Grid(grid.clone(), width, height);
-    }
-
-    /** Alias for {@link #clone()} with casted result.
+    /** {@link #clone()} alternative with casted result. Cloning is not supported on GWT.
      *
-     * @return a new instance of the grid with same size and cell values. */
+     * @return a new instance of the grid with same size and values. */
     public Grid copy() {
-        return new Grid(grid.clone(), width, height);
+        final float[] copy = new float[grid.length];
+        System.arraycopy(grid, 0, copy, 0, copy.length);
+        return new Grid(copy, width, height);
     }
 
     @Override
@@ -353,7 +350,8 @@ public class Grid implements Cloneable {
         /** @param grid contains the cell.
          * @param x column index of the current cell.
          * @param y row index of the current cell.
-         * @param value value stored in the current cell.
+         * @param value value stored in the current cell. Should match {@link Grid#get(int, int)} method result invoked
+         *            with passed coordinates (x and y).
          * @return if true and {@link CellConsumer} is used to iterate over the {@link Grid} using an iteration method
          *         like {@link Grid#forEach(CellConsumer)}, further iteration will be cancelled.
          * @see #BREAK
