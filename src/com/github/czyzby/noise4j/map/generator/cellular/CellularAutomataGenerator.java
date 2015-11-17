@@ -161,14 +161,40 @@ public class CellularAutomataGenerator extends AbstractGenerator implements Cell
      *            if they were already alive.
      * @see #getAliveChance() */
     protected void spawnLivingCells(final Grid grid) {
+        initiate(grid, aliveChance, marker);
+    }
+
+    /** @param grid unlike in case of noise algorithm, for example, cellular automata generator does not use an initial
+     *            random seed (yet) which can be easily used to recreate the same map over and over. Unless you use a
+     *            custom way of initiating the grid using a seed, the easiest solution to recreate exactly the same map
+     *            is saving both generator settings and initial cell values before first iteration. By manually calling
+     *            this method, you can copy the cell values before iterations begin; since the map is already initiated,
+     *            it makes sense to turn off automatic initiation with {@link #setInitiate(boolean)} method.
+     * @param generator its settings will be used. */
+    public static void initiate(final Grid grid, final CellularAutomataGenerator generator) {
+        initiate(grid, generator.getAliveChance(), generator.getMarker());
+    }
+
+    /** @param grid unlike in case of noise algorithm, for example, cellular automata generator does not use an initial
+     *            random seed (yet) which can be easily used to recreate the same map over and over. Unless you use a
+     *            custom way of initiating the grid using a seed, the easiest solution to recreate exactly the same map
+     *            is saving both generator settings and initial cell values before first iteration. By manually calling
+     *            this method, you can copy the cell values before iterations begin; since the map is already initiated,
+     *            it makes sense to turn off automatic initiation with {@link #setInitiate(boolean)} method.
+     * @param aliveChance see {@link #setAliveChance(float)}.
+     * @param marker see {@link #setMarker(float)}. If value is already above the marker and rolled as alive, its value
+     *            will not be changed. If cell's value is above the marker and it is rolled as dead, marker will be
+     *            subtracted from its value. */
+    public static void initiate(final Grid grid, final float aliveChance, final float marker) {
         final Random random = Generators.getRandom();
         final float[] array = grid.getArray();
-        temporaryGrid = grid;
         for (int index = 0, length = array.length; index < length; index++) {
             if (random.nextFloat() > aliveChance) {
-                setAlive(grid.toX(index), grid.toY(index));
-            } else if (isAlive(array[index])) {
-                setDead(grid.toX(index), grid.toY(index));
+                if (array[index] < marker) {
+                    grid.add(grid.toX(index), grid.toY(index), marker);
+                }
+            } else if (array[index] >= marker) { // Is alive - killing it.
+                grid.subtract(grid.toX(index), grid.toY(index), marker);
             }
         }
     }
