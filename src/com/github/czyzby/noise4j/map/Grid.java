@@ -2,13 +2,13 @@ package com.github.czyzby.noise4j.map;
 
 import java.util.Arrays;
 
+import com.github.czyzby.noise4j.array.Array2D;
+
 /** A float array wrapper. Allows to use a single 1D float array as a 2D array.
  *
  * @author MJ */
-public class Grid {
+public class Grid extends Array2D {
     private final float[] grid;
-    private final int width;
-    private final int height;
 
     /** @param size amount of columns and rows. */
     public Grid(final int size) {
@@ -33,9 +33,8 @@ public class Grid {
      * @param width amount of columns.
      * @param height amount of rows. */
     public Grid(final float[] grid, final int width, final int height) {
+        super(width, height);
         this.grid = grid;
-        this.width = width;
-        this.height = height;
         if (grid.length != width * height) {
             throw new IllegalArgumentException("Array with length: " + grid.length
                     + " is too small or too big to store a grid with " + width + " columns and " + height + " rows.");
@@ -47,28 +46,11 @@ public class Grid {
         return grid;
     }
 
-    /** @return amount of columns. */
-    public int getWidth() {
-        return width;
-    }
-
-    /** @return amount of rows. */
-    public int getHeight() {
-        return height;
-    }
-
     /** @param x column index.
      * @param y row index.
      * @return value stored in the chosen cell. */
     public float get(final int x, final int y) {
         return grid[toIndex(x, y)];
-    }
-
-    /** @param x column index.
-     * @param y row index.
-     * @return true if the coordinates are valid and can be safely used with methods like {@link #get(int, int)}. */
-    public boolean isIndexValid(final int x, final int y) {
-        return x >= 0 && x < width && y >= 0 && y < height;
     }
 
     /** @param x column index.
@@ -117,28 +99,6 @@ public class Grid {
      * @return current cell value after modulo operation. */
     public float modulo(final int x, final int y, final float mod) {
         return grid[toIndex(x, y)] %= mod;
-    }
-
-    /** @param x column index.
-     * @param y row index.
-     * @return actual array index of the cell.
-     * @see #getArray() */
-    public int toIndex(final int x, final int y) {
-        return x + y * width;
-    }
-
-    /** @param index actual array index of a cell.
-     * @return column index.
-     * @see #getArray() */
-    public int toX(final int index) {
-        return index % width;
-    }
-
-    /** @param index actual array index of a cell.
-     * @return row index.
-     * @see #getArray() */
-    public int toY(final int index) {
-        return index / width;
     }
 
     /** Iterates over the whole grid.
