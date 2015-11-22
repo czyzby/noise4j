@@ -2,7 +2,7 @@
 
 Simple map generators based on various procedural content generation tutorials.
 
-I really did not want to enforce any kind of map&tile system that you would have to modify - or even copy - to your own implementation. The generators work on a simple 1D float array with a lightweight wrapper, that basically allows to use it as a 2D array. Scales or result values are never enforced - you can generate map with `[0,1]` values range (like in the examples), as well as `[0,1000]` - whatever suits you bests. `Grid` class also comes with some common math operations, so you can manually modify the values if you need to. 
+I really did not want to enforce any kind of map&tile system that you would have to modify, extend or even copy to your own implementation. The generators work on a simple 1D float array with a lightweight wrapper, that basically allows to use it as a 2D array. Result number ranges are never enforced - you can generate map with `[0,1]` values range (like in the examples), as well as `[0,1000]` - whatever suits you bests. `Grid` class also comes with some common math operations, so you can manually modify the values if you feel the need to. 
 
 More generators might be on their way. Making of a room/dungeon generator is somewhere on the TODO list.
 
@@ -11,9 +11,10 @@ Gradle dependency:
 ```
     compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT'
 ```
+The first stable release will be available when I finally decide that "yeah, there are enough generators to make some simple games".
 
 ### LibGDX
-While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. At first, add the mentioned Gradle dependency to the core project. Don't forget to also include the sources dependency in GWT project:
+While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. Start with adding the mentioned Gradle dependency to the core project. Don't forget to also include the sources dependency in GWT project:
 ```
     compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT:sources'
 ```
@@ -23,7 +24,7 @@ You need to inherit `Noise4J` GWT module in your `GdxDefinition`, otherwise GWT 
 	<inherits name='com.github.czyzby.noise4j.Noise4J' />
 ```
 
-`Noise4J` does not use reflection, so its files do not need to be registered in any other way.
+`Noise4J` does not use reflection, so its files usually do not need to be registered in any additional way.
 
 ## Noise generator
 
@@ -64,6 +65,8 @@ public class Example extends ApplicationAdapter {
             final float modifier) {
         noiseGenerator.setRadius(radius);
         noiseGenerator.setModifier(modifier);
+        // Seed ensures randomness, can be saved if you feel the need to
+        // generate the same map in the future.
         noiseGenerator.setSeed(Generators.rollSeed());
         noiseGenerator.generate(grid);
     }
@@ -149,6 +152,7 @@ Bigger radius:
         cellularGenerator.generate(grid);
 ```
 ![CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/cellular-radius2.png "CellularAutomataGenerator")
+Use more iterations for a smoother map. Keep in mind that using a big radius can make the algorithm significantly slower.
 
 
 ### Combined
@@ -157,8 +161,7 @@ Bigger radius:
 
 ![NoiseGenerator + CellularAutomataGenerator](https://github.com/czyzby/noise4j/blob/master/examples/noise%2Bcellular.png "NoiseGenerator + CellularAutomataGenerator")
 
-
-On this scale, this might look somewhat like some cavern system, but you don't have to generate maps that big (or with the same parameters, for that matter). Note that here each tile is represented by a single pixel - given than the map's size is 512x512 tiles, with a relatively small tile image size at 16x16px, this map would need 67108864 (8192x8192) pixels to be drawn. With a smaller map and appropriate tiles, such map could be just as easily used to represent islands, for example.
+On this scale, this might look somewhat like some cavern system, but you don't have to generate maps that big (or with the same parameters, for that matter). Note that here each tile is represented by a single pixel - given than the map's size is 512x512 tiles, with a relatively small tile image size at 16x16px, this map would still need 67108864 (8192x8192) pixels to be drawn. With a smaller map and appropriate tiles, such map could be just as easily used to represent islands, for example.
 
 ## What can I do with the Grid...
 
