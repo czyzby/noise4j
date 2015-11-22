@@ -262,6 +262,17 @@ public class Grid extends Array2D {
         return this;
     }
 
+    /** @param min all values lower than this value will be converted to this value.
+     * @param max all values higher than this value will be converted to this value.
+     * @return this, for chaining. */
+    public Grid clamp(final float min, final float max) {
+        for (int index = 0, length = grid.length; index < length; index++) {
+            final float value = grid[index];
+            grid[index] = value > max ? max : value < min ? min : value;
+        }
+        return this;
+    }
+
     @Override
     public boolean equals(final Object object) {
         return object == this || object instanceof Grid && ((Grid) object).width == width // If width is equal

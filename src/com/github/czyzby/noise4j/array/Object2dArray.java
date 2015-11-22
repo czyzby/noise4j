@@ -23,18 +23,21 @@ public abstract class Object2dArray<Type> extends Array2D implements Iterable<Ty
         this.array = getArray(width * height);
     }
 
-    /** @param array will be wrapped.
+    /** @param array will be wrapped. Has to be valid - it cannot be too small (and it should not be too big either).
      * @param size amount of columns and rows. */
     public Object2dArray(final Type[] array, final int size) {
-        super(size, size);
-        this.array = array;
+        this(array, size, size);
     }
 
-    /** @param array will be wrapped.
+    /** @param array will be wrapped. Has to be valid - it cannot be too small (and it should not be too big either).
      * @param width amount of columns.
      * @param height amount of rows. */
     public Object2dArray(final Type[] array, final int width, final int height) {
         super(width, height);
+        if (array.length < width * height) {
+            throw new IllegalArgumentException(
+                    "Passed array is too small. Expected length: " + width * height + ", received: " + array.length);
+        }
         this.array = array;
     }
 
@@ -43,7 +46,8 @@ public abstract class Object2dArray<Type> extends Array2D implements Iterable<Ty
      * @return a new {@link Object2dArray} wrapping around a simple object array. Note that if you use this method to
      *         create an array, {@link #getArray()} will throw a {@link ClassCastException}. As long as you use safe
      *         methods - like {@link #iterator()}, {@link #get(int, int)}, {@link #set(int, int, Object)} or
-     *         {@link #getObjectArray()} - this is perfectly OK to use this factory method. */
+     *         {@link #getObjectArray()} - this is perfectly OK to use this factory method.
+     * @param <Type> class of stored objects. */
     public static <Type> Object2dArray<Type> newNotTyped(final int width, final int height) {
         return new Object2dArray<Type>(width, height) {
             @Override
@@ -117,6 +121,13 @@ public abstract class Object2dArray<Type> extends Array2D implements Iterable<Ty
         set(x2, y2, first);
     }
 
+    /** @param value will be stored in all array's cells. */
+    public void fill(final Type value) {
+        for (int index = 0, length = width * height; index < length; index++) {
+            array[index] = value;
+        }
+    }
+
     @Override
     public Iterator<Type> iterator() {
         return new ArrayIterator();
@@ -127,16 +138,17 @@ public abstract class Object2dArray<Type> extends Array2D implements Iterable<Ty
      *
      * @author MJ */
     protected class ArrayIterator implements Iterator<Type> {
+        private final int size = width * height; // Does not have to match array.length.
         private int index;
 
         @Override
         public boolean hasNext() {
-            return index < array.length;
+            return index < size;
         }
 
         @Override
         public Type next() {
-            if (index >= array.length) {
+            if (index >= size) {
                 throw new NoSuchElementException();
             }
             return array[index++];
