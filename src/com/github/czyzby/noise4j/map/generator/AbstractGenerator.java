@@ -8,8 +8,8 @@ import com.github.czyzby.noise4j.map.Grid;
 public abstract class AbstractGenerator implements Generator {
     private GenerationMode mode = GenerationMode.ADD;
 
-    /** @return current cell value modifing behavior. */
-    protected GenerationMode getMode() {
+    @Override
+    public GenerationMode getMode() {
         return mode;
     }
 

@@ -10,6 +10,9 @@ public interface Generator {
      *            value. */
     void generate(Grid grid);
 
+    /** @return current generation mode, deciding how values modify current grid's cells. */
+    GenerationMode getMode();
+
     /** @param mode decides how values modify current grid's cells. */
     void setMode(GenerationMode mode);
 

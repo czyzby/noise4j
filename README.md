@@ -155,6 +155,81 @@ Bigger radius:
 Use more iterations for a smoother map. Keep in mind that using a big radius can make the algorithm significantly slower.
 
 
+## Dungeon generator
+LibGDX usage example:
+
+```
+public class Example extends ApplicationAdapter {
+    private SpriteBatch batch;
+    private Texture texture;
+
+    @Override
+    public void create() {
+        final Pixmap map = new Pixmap(512, 512, Format.RGBA8888);
+        final Grid grid = new Grid(511); // This algorithm likes odd-sized maps, although it works either way.
+
+        final DungeonGenerator dungeonGenerator = new DungeonGenerator();
+        dungeonGenerator.setRoomGenerationAttempts(500);
+        dungeonGenerator.setMaxRoomSize(75);
+        dungeonGenerator.setTolerance(10); // Max difference between width and height.
+        dungeonGenerator.setMinRoomSize(9);
+        dungeonGenerator.generate(grid);
+
+        final Color color = new Color();
+        for (int x = 0; x < grid.getWidth(); x++) {
+            for (int y = 0; y < grid.getHeight(); y++) {
+                final float cell = 1f - grid.get(x, y);
+                color.set(cell, cell, cell, 1f);
+                map.drawPixel(x, y, Color.rgba8888(color));
+            }
+        }
+
+        texture = new Texture(map);
+        batch = new SpriteBatch();
+        map.dispose();
+    }
+
+    @Override
+    public void render() {
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(texture, 0f, 0f);
+        batch.end();
+    }
+
+    @Override
+    public void dispose() {
+        texture.dispose();
+        batch.dispose();
+    }
+}
+```
+![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon.png "DungeonGenerator")
+
+This dungeon can be also used to create "perfect" mazes (as in: with one way to solve them):
+
+```
+        final DungeonGenerator dungeonGenerator = new DungeonGenerator();
+        dungeonGenerator.setRoomGenerationAttempts(200);
+        dungeonGenerator.setMaxRoomSize(25);
+        dungeonGenerator.setTolerance(6);
+        dungeonGenerator.setMinRoomSize(9);
+        dungeonGenerator.setWindingChance(0.5f); // More chaotic!
+        dungeonGenerator.setDeadEndRemovalIterations(5); // Introducing dead ends.
+        dungeonGenerator.setRandomConnectorChance(0f); // One way to solve the maze.
+        dungeonGenerator.generate(grid);
+```
+![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon-maze.png "DungeonGenerator")
+
+While these might seem chaotic (or even somewhat unplayable) at first sight, the generator is highly flexible - and no one is forcing you to create such huge maps(/rooms) either. This is a simple set-up for a rogue-like (256x256px, scaled x2):
+
+![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon-simple.png "DungeonGenerator")
+
+In case you're wondering about the settings - it's simply `new DungeonGenerator().generate(grid)`. This is what comes out when you use the default setup, which features relatively small rooms. The one below, on the other hand, has custom min/max room sizes and rooms amount:
+
+![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon-tiny.png "DungeonGenerator")
+
 ### Combined
 
 `NoiseGenerator` and `CellularAutomataGenerator` combined can generate maps similar to this:
@@ -165,11 +240,13 @@ On this scale, this might look somewhat like some cavern system, but you don't h
 
 ## What can I do with the Grid...
 
-By default, noise generator adds [0, `modifier`] to each cell on each generation, smoothing values between the regions that you define.
+By default, **noise generator** adds [0, `modifier`] to each cell on each generation, smoothing values between the regions that you define. It ends up with "realistic" maps with smooth transitions between different regions.
 
-Cellular generator sees cells as alive (`cell >= marker`) or dead (`cell < marker`); on each iteration, it can kill (`cell -= marker`) a cell with too few living neighbors or bring back to live (`cell += marker`) a dead cell with enough neighbors.
+**Cellular generator** sees cells as alive (`cell >= marker`) or dead (`cell < marker`); on each iteration, it can kill (`cell -= marker`) a cell with too few living neighbors or bring back to live (`cell += marker`) a dead cell with enough neighbors. It creates cave-like patterns.
 
-You'll usually end up creating a few `Grid`s, depending on your needs.
+**Dungeon generator** spawns multiple rooms and maze-like corridors between them, converting other cells to walls. Corridors and room floor values can be customized; wall value has to be higher than the other two (but `Grid` provides methods like `replace` or `negate`, so you can use pretty much any setup you need). As you can guess, it generates dungeons.
+
+You'll usually end up creating a few `Grids` and merging them with your custom algorithms, depending on your needs.
 
 ### Usage idea: islands
 - Grid 1: use cellular generator with a higher radius (2-3). (Find sensible birth and death limits! The higher the radius, the higher the limits.)

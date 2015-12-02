@@ -1,14 +1,33 @@
 package com.github.czyzby.noise4j.map.generator.util;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Random;
 
 /** Utilities for map generators.
  *
  * <p>
- * When used in LibGDX applications, it is a good idea to replace {@link Random} and {@link Calculator} instance with
- * values and methods of MathUtils, which provides both more efficient random implementation and sin/cos look-up tables.
- * See {@link #setRandom(Random)} and {@link #setCalculator(Calculator)}.
+ * When used in LibGDX applications, it is a good idea to replace {@link Random} and {@link Calculator} instances with
+ * values and methods of {@code MathUtils} class, which provides both more efficient random implementation and sin/cos
+ * look-up tables. See {@link #setRandom(Random)} and {@link #setCalculator(Calculator)}. This should be done before
+ * using any generators - see example below:
+ *
+ * <blockquote>
+ *
+ * <pre>
+ * Generators.setRandom(MathUtils.random);
+ * Generators.setCalculator(new Calculator() {
+ *     public float sin(float radians) {
+ *         return MathUtils.sin(radians);
+ *     }
+ *
+ *     public float cos(float radians) {
+ *         return MathUtils.cos(radians);
+ *     }
+ * });
+ * </pre>
+ *
+ * </blockquote>
  *
  * @author MJ */
 public class Generators {
@@ -72,6 +91,41 @@ public class Generators {
      * @see BigInteger#probablePrime(int, Random) */
     public static int rollSeed(final int seedBitLength) {
         return BigInteger.probablePrime(seedBitLength, getRandom()).intValue();
+    }
+
+    /** @param min minimum possible random value.
+     * @param max maximum possible random value.
+     * @return random value in the specified range. */
+    public static int randomInt(final int min, final int max) {
+        return min + getRandom().nextInt(max - min + 1);
+    }
+
+    /** @param list a list of elements.
+     * @return random list element.
+     * @param <Type> type of stored elements. */
+    public static <Type> Type randomElement(final List<Type> list) {
+        return list.get(getRandom().nextInt(list.size()));
+    }
+
+    /** @return a random float in range of 0f (inclusive) to 1f (exclusive). */
+    public static float randomPercent() {
+        return getRandom().nextFloat();
+    }
+
+    /** GWT-compatible collection shuffling method. Use only for lists with quick random access; use
+     * {@link java.util.Collections#shuffle(List)} if not targeting GWT.
+     *
+     * @param list its elements will be shuffled.
+     * @return passed list, for chaining.
+     * @param <Type> type of elements stored in the list. */
+    public static <Type> List<Type> shuffle(final List<Type> list) {
+        final Random random = getRandom();
+        int swap;
+        for (int i = list.size(); i > 1; i--) {
+            swap = random.nextInt(i);
+            list.set(swap, list.set(i - 1, list.get(swap)));
+        }
+        return list;
     }
 
     /** Allows to calculate common generators' functions. By implementing this interface, you can replace these common

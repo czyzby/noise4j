@@ -197,6 +197,39 @@ public class Grid extends Array2D {
         return this;
     }
 
+    /** Sets all values in the map.
+     *
+     * @param value will be set.
+     * @return this, for chaining.
+     * @see #set(float) */
+    public Grid fill(final float value) {
+        return set(value);
+    }
+
+    /** Sets all values in the selected column.
+     *
+     * @param x column index.
+     * @param value will be set.
+     * @return this, for chaining. */
+    public Grid fillColumn(final int x, final float value) {
+        for (int y = 0; y < height; y++) {
+            grid[toIndex(x, y)] = value;
+        }
+        return this;
+    }
+
+    /** Sets all values in the selected row.
+     *
+     * @param y row index.
+     * @param value will be set.
+     * @return this, for chaining. */
+    public Grid fillRow(final int y, final float value) {
+        for (int x = 0; x < width; x++) {
+            grid[toIndex(x, y)] = value;
+        }
+        return this;
+    }
+
     /** Increases all values in the map.
      *
      * @param value will be added.
@@ -269,6 +302,38 @@ public class Grid extends Array2D {
         for (int index = 0, length = grid.length; index < length; index++) {
             final float value = grid[index];
             grid[index] = value > max ? max : value < min ? min : value;
+        }
+        return this;
+    }
+
+    /** @param value cells storing this value will be replaced.
+     * @param withValue this value will replace the affected cells.
+     * @return this, for chaining. */
+    public Grid replace(final float value, final float withValue) {
+        for (int index = 0, length = grid.length; index < length; index++) {
+            if (Float.compare(grid[index], value) == 0) {
+                grid[index] = withValue;
+            }
+        }
+        return this;
+    }
+
+    /** Increases value in each cell by 1.
+     *
+     * @return this, for chaining. */
+    public Grid increment() {
+        for (int index = 0, length = grid.length; index < length; index++) {
+            grid[index]++;
+        }
+        return this;
+    }
+
+    /** Decreases value in each cell by 1.
+     *
+     * @return this, for chaining. */
+    public Grid decrement() {
+        for (int index = 0, length = grid.length; index < length; index++) {
+            grid[index]--;
         }
         return this;
     }
