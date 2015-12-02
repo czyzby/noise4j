@@ -240,7 +240,7 @@ On this scale, this might look somewhat like some cavern system, but you don't h
 
 ## What can I do with the Grid...
 
-By default, **noise generator** adds [0, `modifier`] to each cell on each generation, smoothing values between the regions that you define. It ends up with "realistic" maps with smooth transitions between different regions.
+By default, **noise generator** adds `[0, modifier]` to each cell on each generation, smoothing values between the regions that you define. It ends up with "realistic" maps with smooth transitions between different regions.
 
 **Cellular generator** sees cells as alive (`cell >= marker`) or dead (`cell < marker`); on each iteration, it can kill (`cell -= marker`) a cell with too few living neighbors or bring back to live (`cell += marker`) a dead cell with enough neighbors. It creates cave-like patterns.
 
@@ -249,7 +249,7 @@ By default, **noise generator** adds [0, `modifier`] to each cell on each genera
 You'll usually end up creating a few `Grids` and merging them with your custom algorithms, depending on your needs.
 
 ### Usage idea: islands
-- Grid 1: use cellular generator with a higher radius (2-3). (Find sensible birth and death limits! The higher the radius, the higher the limits.)
-- Grid 2: use noise generator with a few stages, with modifiers summing up to `1f`. This will be the height map.
-- Grid 3: use noise generator with a few stages, with modifiers summing up to `1f`. This will be the moisture map.
+- *Grid 1*: use cellular generator with a higher radius (2-3). (Find sensible birth and death limits! The higher the radius, the higher the limits.)
+- *Grid 2*: use noise generator with a few stages, with modifiers summing up to `1f`. This will be the height map.
+- *Grid 3*: use noise generator with a few stages, with modifiers summing up to `1f`. This will be the moisture map.
 - Combine grids: create an instance of your tiled map. If the cell is alive(/dead) in the first grid, tile of your map becomes water - if it is also close to the ground, it can become shallow water. If the cell is not water, check height and moisture values to determine tile type. For example, desert/canyon can be low and dry, forest can be medium-high and wet, swamp - low and wet, grass - medium all the way, etc. Trigger the generators' parameters for the most realistic maps with smooth terrain transitions.
