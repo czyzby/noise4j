@@ -100,11 +100,17 @@ public class Generators {
         return min + getRandom().nextInt(max - min + 1);
     }
 
-    /** @param list a list of elements.
+    /** @param list a list of elements. Cannot be null or empty.
      * @return random list element.
      * @param <Type> type of stored elements. */
     public static <Type> Type randomElement(final List<Type> list) {
-        return list.get(getRandom().nextInt(list.size()));
+        return list.get(randomIndex(list));
+    }
+
+    /** @param list a list of elements. Cannot be null or empty.
+     * @return random index of an element stored in the list. */
+    public static int randomIndex(final List<?> list) {
+        return getRandom().nextInt(list.size());
     }
 
     /** @return a random float in range of 0f (inclusive) to 1f (exclusive). */

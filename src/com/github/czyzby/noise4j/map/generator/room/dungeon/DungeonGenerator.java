@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import com.github.czyzby.noise4j.array.Int2dArray;
@@ -71,11 +70,11 @@ public class DungeonGenerator extends AbstractRoomGenerator {
     private int deadEndRemovalIterations = Integer.MAX_VALUE;
 
     // Control variables.
-    private final List<Room> rooms = new LinkedList<Room>();
-    private final Queue<Point> cells = new LinkedList<Point>();
+    private final List<Room> rooms = new ArrayList<Room>();
     private final List<Direction> directions = new ArrayList<Direction>();
     private Int2dArray regions;
     private int currentRegion;
+    private int lastRoomRegion;
 
     /** Not thread-safe. Uses static generator instance. Since this method provides only basic settings, creating or
      * obtaining an instance of the generator is generally preferred.
@@ -117,9 +116,8 @@ public class DungeonGenerator extends AbstractRoomGenerator {
 
     /** Resets control variables. */
     protected void reset() {
-        currentRegion = -1;
+        currentRegion = lastRoomRegion = -1;
         rooms.clear();
-        cells.clear();
         directions.clear();
         regions = null;
     }
@@ -145,21 +143,19 @@ public class DungeonGenerator extends AbstractRoomGenerator {
     /** @param grid is being generated.
      * @param attempts amount of attempts of placing rooms before the generator gives up. */
     protected void spawnRooms(final Grid grid, final int attempts) {
-        for (int index = 0; index < attempts; index++) {
+        for (int index = 0, maxRoomsAmount = getMaxRoomsAmount(); index < attempts; index++) {
             final Room newRoom = getRandomRoom(grid);
             if (!overlapsAny(newRoom)) {
                 rooms.add(newRoom);
-                carveRoom(grid, newRoom);
+                carveRoom(grid, newRoom, floorThreshold);
                 nextRegion();
                 newRoom.fill(regions, currentRegion); // Assigning region values to all cells.
             }
+            if (maxRoomsAmount > 0 && rooms.size() >= maxRoomsAmount) {
+                break;
+            }
         }
-    }
-
-    /** @param grid contains the room.
-     * @param newRoom was just spawned. Should fill its values in the grid. */
-    protected void carveRoom(final Grid grid, final Room newRoom) {
-        newRoom.fill(grid, floorThreshold);
+        lastRoomRegion = currentRegion;
     }
 
     /** @param room validated room.
@@ -177,7 +173,7 @@ public class DungeonGenerator extends AbstractRoomGenerator {
     protected void spawnCorridors(final Grid grid) {
         for (int x = 1, width = grid.getWidth(); x < width; x += 2) {
             for (int y = 1, height = grid.getHeight(); y < height; y += 2) {
-                if (isWall(grid, x, y)) {
+                if (isCarveable(grid, x, y)) {
                     carveMaze(grid, new Point(x, y));
                 }
             }
@@ -189,7 +185,7 @@ public class DungeonGenerator extends AbstractRoomGenerator {
      * @param y row index.
      * @return true if the selected cell is a wall. */
     protected boolean isWall(final Grid grid, final int x, final int y) {
-        return grid.get(x, y) >= wallThreshold;
+        return grid.isIndexValid(x, y) && grid.get(x, y) >= wallThreshold;
     }
 
     /** @param grid contains the point.
@@ -244,7 +240,18 @@ public class DungeonGenerator extends AbstractRoomGenerator {
         final int x = direction.nextX(point.x, 2); // Omitting 1 field, checking the next odd one.
         final int y = direction.nextY(point.y, 2);
         // Checking if index within grid bounds and not in a region yet:
-        return grid.isIndexValid(x, y) && isWall(grid, x, y);
+        return isCarveable(grid, x, y);
+    }
+
+    /** @param grid contains the point.
+     * @param x column index.
+     * @param y row index.
+     * @return true if the point can be a corridor. */
+    protected boolean isCarveable(final Grid grid, final int x, final int y) {
+        return isWall(grid, x, y)
+                // Diagonal:
+                && isWall(grid, x + 1, y + 1) && isWall(grid, x - 1, y + 1) && isWall(grid, x + 1, y - 1)
+                && isWall(grid, x - 1, y - 1);
     }
 
     /** @param grid contains unconnected room and corridor regions. */
@@ -314,6 +321,7 @@ public class DungeonGenerator extends AbstractRoomGenerator {
      * @param y row index. */
     protected void carveConnector(final Grid grid, final int x, final int y) {
         grid.set(x, y, corridorThreshold);
+        regions.set(x, y, lastRoomRegion + 1); // Treating connector as corridor.
     }
 
     /** @param grid contains unconnected room and corridor regions.
@@ -422,7 +430,7 @@ public class DungeonGenerator extends AbstractRoomGenerator {
      * @param y row index.
      * @return true if the cell has at least 3 wall neighbors. */
     protected boolean isDeadEnd(final Grid grid, final int x, final int y) {
-        if (grid.isIndexValid(x, y) && !isWall(grid, x, y)) {
+        if (grid.isIndexValid(x, y) && !isWall(grid, x, y) && isCorridor(x, y)) {
             int wallNeighbors = 0;
             int nextX;
             int nextY;
@@ -436,6 +444,14 @@ public class DungeonGenerator extends AbstractRoomGenerator {
             return wallNeighbors >= 3;
         }
         return false;
+    }
+
+    /** @param x column index.
+     * @param y row index.
+     * @return true if selected cell is a corridor. Works only if the cell is not a wall. This check works if all rooms
+     *         and corridors are already spawned. */
+    protected boolean isCorridor(final int x, final int y) {
+        return getRegion(x, y) > lastRoomRegion;
     }
 
     @Override // Room position has to be odd.

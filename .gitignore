@@ -5,6 +5,7 @@ bin/
 .gradle/
 build/
 gradle.properties
+TODO
 
 #Idea
 .idea/

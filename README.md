@@ -4,8 +4,6 @@ Simple map generators based on various procedural content generation tutorials.
 
 I really did not want to enforce any kind of map&tile system that you would have to modify, extend or even copy to your own implementation. The generators work on a simple 1D float array with a lightweight wrapper, that basically allows to use it as a 2D array. Result number ranges are never enforced - you can generate map with `[0,1]` values range (like in the examples), as well as `[0,1000]` - whatever suits you bests. `Grid` class also comes with some common math operations, so you can manually modify the values if you feel the need to. 
 
-More generators might be on their way. Making of a room/dungeon generator is somewhere on the TODO list.
-
 ## Dependency
 Gradle dependency:
 ```
@@ -166,7 +164,7 @@ public class Example extends ApplicationAdapter {
     @Override
     public void create() {
         final Pixmap map = new Pixmap(512, 512, Format.RGBA8888);
-        final Grid grid = new Grid(511); // This algorithm likes odd-sized maps, although it works either way.
+        final Grid grid = new Grid(512); // This algorithm likes odd-sized maps, although it works either way.
 
         final DungeonGenerator dungeonGenerator = new DungeonGenerator();
         dungeonGenerator.setRoomGenerationAttempts(500);
