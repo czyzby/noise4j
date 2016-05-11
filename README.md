@@ -7,20 +7,20 @@ I really did not want to enforce any kind of map&tile system that you would have
 ## Dependency
 Gradle dependency:
 ```
-    compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT'
+    compile 'com.github.czyzby:noise4j:0.1.0'
 ```
-The first stable release will be available when I finally decide that "yeah, there are enough generators to make some simple games".
 
 ### LibGDX
-While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. Start with adding the mentioned Gradle dependency to the core project. Don't forget to also include the sources dependency in GWT project:
+While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. Start with adding the mentioned Gradle dependency to the core project:
 ```
-    compile 'com.github.czyzby:noise4j:0.0.1-SNAPSHOT:sources'
+    compile 'com.github.czyzby:noise4j:0.1.0'
 ```
 
 You need to inherit `Noise4J` GWT module in your `GdxDefinition`, otherwise GWT compiler will not recognize the classes:
 ```
 	<inherits name='com.github.czyzby.noise4j.Noise4J' />
 ```
+Also, don't forget to also include the sources dependency in GWT project: `compile 'com.github.czyzby:noise4j:0.1.0:sources'`.
 
 `Noise4J` does not use reflection, so its files usually do not need to be registered in any additional way.
 
@@ -204,6 +204,10 @@ public class Example extends ApplicationAdapter {
 }
 ```
 ![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon.png "DungeonGenerator")
+
+Different room types are also supported. While you can implement `RoomType` and fully control how rooms are "carved" in the walls, you can also use some default proposed room types with `dungeonGenerator.addRoomTypes(DefaultRoomType.values());`:
+
+![DungeonGenerator](https://github.com/czyzby/noise4j/blob/master/examples/dungeon-shapes.png "DungeonGenerator")
 
 This dungeon can be also used to create "perfect" mazes (as in: with one way to solve them):
 

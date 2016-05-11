@@ -12,7 +12,8 @@ import com.github.czyzby.noise4j.map.generator.room.AbstractRoomGenerator.Room;
  * than rooms' bounds, so - for example - diamond rooms can have corridors around them, even though they would normally
  * overlap with a plain square room.
  *
- * @author MJ */
+ * @author MJ
+ * @see Interceptor */
 public interface RoomType {
     /** @param room should be filled.
      * @param grid should contain the room in its selected position.
@@ -25,9 +26,8 @@ public interface RoomType {
     boolean isValid(Room room);
 
     /** Wraps around an existing type, allowing to slightly modify its behavior. A common usage can be changing of tile
-     * value in {@link #carve(Room, Grid, float)} method to a custom one, allowing different room types to use different
-     * tile sets, for example. Extend this class and override {@link #isValid(Room)} if you want to add custom
-     * conditions.
+     * value in carve method to a custom one, allowing different room types to use different tile sets, for example.
+     * Extend this class and override isValid method if you want to add custom conditions.
      *
      * @author MJ */
     public static class Interceptor implements RoomType {
@@ -35,7 +35,7 @@ public interface RoomType {
         protected final float value;
 
         /** @param type wrapped type. Will delegate method calls to this type. Cannot be null.
-         * @param value custom value passed to {@link #carve(Room, Grid, float)} method. */
+         * @param value custom value passed to carving method. */
         public Interceptor(final RoomType type, final float value) {
             this.type = type;
             this.value = value;
@@ -171,7 +171,7 @@ public interface RoomType {
             public boolean isValid(final Room room) {
                 return room.getWidth() >= MIN_SIZE && room.getHeight() >= MIN_SIZE;
             }
-        }; // TODO circle
+        };
 
         @Override
         public boolean isValid(final Room room) {
