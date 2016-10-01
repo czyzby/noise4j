@@ -6,18 +6,18 @@ I really did not want to enforce any kind of map&tile system that you would have
 
 ## Dependency
 Gradle dependency:
-```
+```Groovy
     compile 'com.github.czyzby:noise4j:0.1.0'
 ```
 
 ### LibGDX
 While `Noise4J` was created with `LibGDX` games in mind, it has no external dependencies. It's GWT- and Java 6-compatible, so including it in `LibGDX` projects is pretty straightforward. Start with adding the mentioned Gradle dependency to the core project:
-```
+```Groovy
     compile 'com.github.czyzby:noise4j:0.1.0'
 ```
 
 You need to inherit `Noise4J` GWT module in your `GdxDefinition`, otherwise GWT compiler will not recognize the classes:
-```
+```XML
 	<inherits name='com.github.czyzby.noise4j.Noise4J' />
 ```
 Also, don't forget to also include the sources dependency in GWT project: `compile 'com.github.czyzby:noise4j:0.1.0:sources'`.
@@ -28,7 +28,7 @@ Also, don't forget to also include the sources dependency in GWT project: `compi
 
 LibGDX usage example:
 
-```
+```Java
 public class Example extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture texture;
@@ -91,7 +91,7 @@ public class Example extends ApplicationAdapter {
 
 LibGDX usage example:
 
-```
+```Java
 public class Example extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture texture;
@@ -140,7 +140,7 @@ public class Example extends ApplicationAdapter {
 
 
 Bigger radius:
-```
+```Java
         final CellularAutomataGenerator cellularGenerator = new CellularAutomataGenerator();
         cellularGenerator.setAliveChance(0.5f);
         cellularGenerator.setRadius(2);
@@ -156,7 +156,7 @@ Use more iterations for a smoother map. Keep in mind that using a big radius can
 ## Dungeon generator
 LibGDX usage example:
 
-```
+```Java
 public class Example extends ApplicationAdapter {
     private SpriteBatch batch;
     private Texture texture;
@@ -211,7 +211,7 @@ Different room types are also supported. While you can implement `RoomType` and 
 
 This dungeon can be also used to create "perfect" mazes (as in: with one way to solve them):
 
-```
+```Java
         final DungeonGenerator dungeonGenerator = new DungeonGenerator();
         dungeonGenerator.setRoomGenerationAttempts(200);
         dungeonGenerator.setMaxRoomSize(25);
